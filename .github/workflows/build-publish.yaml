@@ -1,0 +1,101 @@
+name: Build and publish
+on:
+  push:
+    branches: [ main ]
+  schedule:
+    # * is a special character in YAML so you have to quote this string
+    - cron:  '0 */8 * * *'
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout main
+      uses: actions/checkout@main
+
+    - name: Set up Python 3
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3
+
+    - name: Install awscli
+      run: pip3 install awscli awscli-plugin-endpoint
+
+    - name: Set up awscli configuration
+      env:
+        DO_SPACES_KEY: ${{ secrets.DO_SPACES_KEY }}
+        DO_SPACES_SECRET: ${{ secrets.DO_SPACES_SECRET }}
+      run: |
+        set -e;
+        mkdir ~/.aws;
+        echo "
+        [default]
+        aws_access_key_id=$DO_SPACES_KEY
+        aws_secret_access_key=$DO_SPACES_SECRET
+        " > ~/.aws/credentials;
+        echo "
+        [plugins]
+        endpoint = awscli_plugin_endpoint
+        [default]
+        region = fr-par
+        s3 =
+          endpoint_url = https://fra1.digitaloceanspaces.com
+          signature_version = s3v4
+          max_concurrent_requests = 100
+          max_queue_size = 1000
+          multipart_threshold = 1000MB
+          # Edit the multipart_chunksize value according to the file sizes that you want to upload. The present configuration allows to upload files up to 10 GB (100 requests * 10MB). For example setting it to 5GB allows you to upload files up to 5TB.
+          multipart_chunksize = 1000MB
+        s3api =
+          endpoint_url = https://fra1.digitaloceanspaces.com
+        " > ~/.aws/config;
+
+    - name: Ensure that bucket versioning is enabled
+      env:
+        DO_SPACES_BUCKET_NAME: ${{ secrets.DO_SPACES_BUCKET_NAME }}
+      run: aws s3api put-bucket-versioning  --bucket $DO_SPACES_BUCKET_NAME --versioning-configuration 'Status=Enabled'
+
+    - name: Set up Node.js 12
+      uses: actions/setup-node@v1
+      with:
+        node-version: 12
+
+    - name: Install dependencies
+      run: npm i
+
+    - name: Run tests
+      run: npm run test
+
+    - name: Fetch and upload gtfs file
+      env:
+        OPENDATA_OEPNV_EMAIL: ${{ secrets.OPENDATA_OEPNV_EMAIL }}
+        OPENDATA_OEPNV_PASSWORD: ${{ secrets.OPENDATA_OEPNV_PASSWORD }}
+        DO_SPACES_BUCKET_NAME: ${{ secrets.DO_SPACES_BUCKET_NAME }}
+      run: |
+        set -e;
+        npm run fetch-gtfs;
+        currentobj=$(aws s3api head-object --bucket $DO_SPACES_BUCKET_NAME --key gtfs-germany.zip);
+        newhash=$(cat gtfs.zip | md5sum);
+        if [ $(echo $currentobj | grep $newhash | wc -l) -ne 1 ]
+        then
+          aws s3 cp --acl public-read gtfs.zip s3://"$DO_SPACES_BUCKET_NAME"/gtfs-germany.zip
+        else
+          echo 'file unchanged, skipping.'
+        fi;
+
+    # todo: run even if fetching gtfs failed
+    - name: Fetch and upload zhv file
+      env:
+        OPENDATA_OEPNV_EMAIL: ${{ secrets.OPENDATA_OEPNV_EMAIL }}
+        OPENDATA_OEPNV_PASSWORD: ${{ secrets.OPENDATA_OEPNV_PASSWORD }}
+        DO_SPACES_BUCKET_NAME: ${{ secrets.DO_SPACES_BUCKET_NAME }}
+      run: |
+        set -e;
+        npm run fetch-zhv;
+        currentobj=$(aws s3api head-object --bucket $DO_SPACES_BUCKET_NAME --key zhv.zip);
+        newhash=$(cat zhv.zip | md5sum);
+        if [ $(echo $currentobj | grep $newhash | wc -l) -ne 1 ]
+        then
+          aws s3 cp --acl public-read zhv.zip s3://"$DO_SPACES_BUCKET_NAME"/zhv.zip
+        else
+          echo 'file unchanged, skipping.'
+        fi;
