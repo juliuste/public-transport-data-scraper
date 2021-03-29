@@ -8,8 +8,8 @@ The datasets are provided as [CC-BY 4.0](https://creativecommons.org/licenses/by
 
 Dataset | Stable URL
 ------- | ---
-[Germany-wide GTFS feed](https://www.opendata-oepnv.de/ht/de/organisation/delfi/startseite?tx_vrrkit_view%5Bdataset_name%5D=deutschlandweite-sollfahrplandaten-gtfs&tx_vrrkit_view%5Baction%5D=details&tx_vrrkit_view%5Bcontroller%5D=View) | [latest](https://opendata-oepnv.fra1.digitaloceanspaces.com/gtfs-germany.zip)
-[German public transport stop registry (ZHV)](https://www.opendata-oepnv.de/ht/de/organisation/delfi/startseite?tx_vrrkit_view%5Bdataset_name%5D=deutschlandweite-haltestellendaten&tx_vrrkit_view%5Baction%5D=details&tx_vrrkit_view%5Bcontroller%5D=View) | [latest](https://opendata-oepnv.fra1.digitaloceanspaces.com/zhv.zip)
+[Germany-wide GTFS feed](https://www.opendata-oepnv.de/ht/de/organisation/delfi/startseite?tx_vrrkit_view%5Bdataset_name%5D=deutschlandweite-sollfahrplandaten-gtfs&tx_vrrkit_view%5Baction%5D=details&tx_vrrkit_view%5Bcontroller%5D=View) | [latest](https://de.data.public-transport.earth/gtfs-germany.zip)
+[German public transport stop registry (ZHV)](https://www.opendata-oepnv.de/ht/de/organisation/delfi/startseite?tx_vrrkit_view%5Bdataset_name%5D=deutschlandweite-haltestellendaten&tx_vrrkit_view%5Baction%5D=details&tx_vrrkit_view%5Bcontroller%5D=View) | [latest](https://de.data.public-transport.earth/zhv.zip)
 
 ## Contributing
 
