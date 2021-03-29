@@ -82,7 +82,25 @@ jobs:
           echo 'file unchanged, skipping.'
         fi;
 
-    # todo: run even if fetching gtfs failed
+    # todo: run even if previous steps failed
+    - name: Fetch and upload netex file
+      env:
+        OPENDATA_OEPNV_EMAIL: ${{ secrets.OPENDATA_OEPNV_EMAIL }}
+        OPENDATA_OEPNV_PASSWORD: ${{ secrets.OPENDATA_OEPNV_PASSWORD }}
+        DO_SPACES_BUCKET_NAME: ${{ secrets.DO_SPACES_BUCKET_NAME }}
+      run: |
+        set -e;
+        npm run fetch-netex;
+        currentobj=$(aws s3api head-object --bucket $DO_SPACES_BUCKET_NAME --key netex-germany.zip);
+        newhash=$(cat netex.zip | md5sum);
+        if [ $(echo $currentobj | grep $newhash | wc -l) -ne 1 ]
+        then
+          aws s3 cp --acl public-read netex.zip s3://"$DO_SPACES_BUCKET_NAME"/netex-germany.zip
+        else
+          echo 'file unchanged, skipping.'
+        fi;
+
+    # todo: run even if previous steps failed
     - name: Fetch and upload zhv file
       env:
         OPENDATA_OEPNV_EMAIL: ${{ secrets.OPENDATA_OEPNV_EMAIL }}

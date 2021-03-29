@@ -59,10 +59,16 @@ const gtfs = () => {
 	fetchAndOutput(user, password, datasetName, isMatchingFile).catch(logAndExit)
 }
 
+const netex = () => {
+	const datasetName = 'deutschlandweite-sollfahrplandaten'
+	const isMatchingFile = name => name.endsWith('_fahrplaene_gesamtdeutschland.zip')
+	fetchAndOutput(user, password, datasetName, isMatchingFile).catch(logAndExit)
+}
+
 const zhv = () => {
 	const datasetName = 'deutschlandweite-haltestellendaten'
 	const isMatchingFile = name => name.endsWith('_zHV_gesamt.zip')
 	fetchAndOutput(user, password, datasetName, isMatchingFile).catch(logAndExit)
 }
 
-module.exports = { gtfs, zhv }
+module.exports = { gtfs, netex, zhv }

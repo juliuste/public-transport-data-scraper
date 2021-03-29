@@ -12,6 +12,7 @@
 		"check-deps": "depcheck",
 		"lint": "eslint build.js",
 		"fetch-gtfs": "node -e \"require('./build.js').gtfs()\" > gtfs.zip && (if [ $(wc -c gtfs.zip | awk '{print $1}') -lt 100000000 ]; then (echo 'Unexpected file size, seems to small.'; exit 1;) fi;)",
+		"fetch-netex": "node -e \"require('./build.js').netex()\" > netex.zip && (if [ $(wc -c netex.zip | awk '{print $1}') -lt 500000000 ]; then (echo 'Unexpected file size, seems to small.'; exit 1;) fi;)",
 		"fetch-zhv": "node -e \"require('./build.js').zhv()\" > zhv.zip && (if [ $(wc -c zhv.zip | awk '{print $1}') -lt 10000000 ]; then (echo 'Unexpected file size, seems to small.'; exit 1;) fi;)",
 		"test": "npm run lint && npm run check-deps"
 	},
