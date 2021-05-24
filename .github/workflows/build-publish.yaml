@@ -66,6 +66,7 @@ jobs:
       run: npm run test
 
     - name: Fetch and upload gtfs file
+      if: ${{ success() }} # this should allow the other steps to run, but should still mark the workflow as failing
       env:
         OPENDATA_OEPNV_EMAIL: ${{ secrets.OPENDATA_OEPNV_EMAIL }}
         OPENDATA_OEPNV_PASSWORD: ${{ secrets.OPENDATA_OEPNV_PASSWORD }}
@@ -82,8 +83,8 @@ jobs:
           echo 'file unchanged, skipping.'
         fi;
 
-    # todo: run even if previous steps failed
     - name: Fetch and upload netex file
+      if: ${{ success() || failure() }} # this should allow the other steps to run, but should still mark the workflow as failing
       env:
         OPENDATA_OEPNV_EMAIL: ${{ secrets.OPENDATA_OEPNV_EMAIL }}
         OPENDATA_OEPNV_PASSWORD: ${{ secrets.OPENDATA_OEPNV_PASSWORD }}
@@ -100,8 +101,8 @@ jobs:
           echo 'file unchanged, skipping.'
         fi;
 
-    # todo: run even if previous steps failed
     - name: Fetch and upload zhv file
+      if: ${{ success() || failure() }} # this should allow the other steps to run, but should still mark the workflow as failing
       env:
         OPENDATA_OEPNV_EMAIL: ${{ secrets.OPENDATA_OEPNV_EMAIL }}
         OPENDATA_OEPNV_PASSWORD: ${{ secrets.OPENDATA_OEPNV_PASSWORD }}
