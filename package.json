@@ -17,19 +17,18 @@
 		"test": "npm run lint && npm run check-deps"
 	},
 	"dependencies": {
-		"cheerio": "^1.0.0-rc.3",
-		"got": "^11.7.0"
+		"cheerio": "^1.0.0-rc.10",
+		"got": "^11.8.2"
 	},
 	"devDependencies": {
-		"depcheck": "^1.2.0",
-		"eslint": "^7.11.0",
-		"eslint-config-standard": "^14.1.1",
-		"eslint-plugin-import": "^2.22.1",
+		"depcheck": "^1.4.2",
+		"eslint": "^7.32.0",
+		"eslint-config-standard": "^16.0.3",
+		"eslint-plugin-import": "^2.24.0",
 		"eslint-plugin-node": "^11.1.0",
-		"eslint-plugin-promise": "^4.2.1",
-		"eslint-plugin-standard": "^4.0.1"
+		"eslint-plugin-promise": "^5.1.0"
 	},
 	"engines": {
-		"node": ">=10"
+		"node": ">=16"
 	}
 }
