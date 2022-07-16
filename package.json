@@ -10,6 +10,7 @@
 	"author": "Julius Tens <mail@juliustens.eu>",
 	"scripts": {
 		"check-deps": "depcheck",
+		"fix": "npm run lint -- --fix",
 		"lint": "eslint build.js",
 		"fetch-gtfs": "node -e \"require('./build.js').gtfs()\" > gtfs.zip && (if [ $(wc -c gtfs.zip | awk '{print $1}') -lt 100000000 ]; then (echo 'Unexpected file size, seems to small.'; exit 1;) fi;)",
 		"fetch-netex": "node -e \"require('./build.js').netex()\" > netex.zip && (if [ $(wc -c netex.zip | awk '{print $1}') -lt 500000000 ]; then (echo 'Unexpected file size, seems to small.'; exit 1;) fi;)",
@@ -22,11 +23,11 @@
 	},
 	"devDependencies": {
 		"depcheck": "^1.4.2",
-		"eslint": "^7.32.0",
-		"eslint-config-standard": "^16.0.3",
+		"eslint": "^8.19.0",
+		"eslint-config-standard": "^17.0.0",
 		"eslint-plugin-import": "^2.24.0",
-		"eslint-plugin-node": "^11.1.0",
-		"eslint-plugin-promise": "^5.1.0"
+		"eslint-plugin-n": "^15.2.4",
+		"eslint-plugin-promise": "^6.0.0"
 	},
 	"engines": {
 		"node": ">=14"
