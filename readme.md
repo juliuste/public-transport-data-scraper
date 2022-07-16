@@ -1,4 +1,4 @@
-# public-transport-feed-scraper
+# public-transport-data-scraper
 
 Scraper that re-publishes official public transport datasets under stable URLs, since many transportation authorities and government agencies sadly don't provide any on their own, making it nearly impossible to integrate these datasets in automated systems.
 
@@ -12,4 +12,4 @@ Dataset | License | Attribution | Stable URL
 
 ## Contributing
 
-If you found a bug, want to propose a feed or add a new scraper, feel free to visit [the issues page](https://github.com/juliuste/public-transport-feed-scraper/issues), or open a pull request.
+If you found a bug, want to propose a feed or add a new scraper, feel free to visit [the issues page](https://github.com/juliuste/public-transport-data-scraper/issues), or open a pull request.
