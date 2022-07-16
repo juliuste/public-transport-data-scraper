@@ -1,22 +1,38 @@
-name: Build and publish
+name: CI
 on:
   push:
-    branches: [ main ]
+  pull_request:
   schedule:
     # * is a special character in YAML so you have to quote this string
     - cron: '0 */8 * * *'
 jobs:
-  run:
+  test:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout main
-      uses: actions/checkout@main
+      uses: actions/checkout@v2
+    - name: Set up Node.js 16
+      uses: actions/setup-node@v1
+      with:
+        node-version: 16
+    - name: Install dependencies
+      run: npx pnpm i
+    - name: Run tests
+      run: npx pnpm test
+      env:
+        CI: true
 
+  build-and-push:
+    runs-on: ubuntu-latest
+    needs: test
+    if: github.ref == 'refs/heads/main'
+    steps:
+    - name: Checkout main
+      uses: actions/checkout@main
     - name: Set up Python 3
       uses: actions/setup-python@v2
       with:
         python-version: 3
-
     - name: Install awscli
       run: pip3 install awscli awscli-plugin-endpoint
 
@@ -58,14 +74,10 @@ jobs:
       uses: actions/setup-node@v1
       with:
         node-version: 16
-
     - name: Install dependencies
-      run: npm i
+      run: npx pnpm i
 
-    - name: Run tests
-      run: npm run test
-
-    - name: Fetch and upload gtfs file
+    - name: "Fetch and upload feed: DE_GTFS"
       if: ${{ success() }} # this should allow the other steps to run, but should still mark the workflow as failing
       env:
         OPENDATA_OEPNV_EMAIL: ${{ secrets.OPENDATA_OEPNV_EMAIL }}
@@ -83,7 +95,7 @@ jobs:
           echo 'file unchanged, skipping.'
         fi;
 
-    - name: Fetch and upload netex file
+    - name: "Fetch and upload feed: DE_NETEX"
       if: ${{ success() || failure() }} # this should allow the other steps to run, but should still mark the workflow as failing
       env:
         OPENDATA_OEPNV_EMAIL: ${{ secrets.OPENDATA_OEPNV_EMAIL }}
@@ -101,7 +113,7 @@ jobs:
           echo 'file unchanged, skipping.'
         fi;
 
-    - name: Fetch and upload zhv file
+    - name: "Fetch and upload feed: DE_ZHV"
       if: ${{ success() || failure() }} # this should allow the other steps to run, but should still mark the workflow as failing
       env:
         OPENDATA_OEPNV_EMAIL: ${{ secrets.OPENDATA_OEPNV_EMAIL }}

@@ -4,8 +4,8 @@
 // 1. obtain a session cookie and the zip file's url
 // 2. download the data using the session cookie
 
-const got = require('got')
-const cheerio = require('cheerio')
+import got from 'got'
+import cheerio from 'cheerio'
 
 const extractUrlFromResponse = (html, isMatchingFile) => {
 	const parsed = cheerio.load(html)
@@ -44,31 +44,20 @@ const fetchAndOutput = async (user, password, datasetName, isMatchingFile) => {
 	return stream.pipe(process.stdout)
 }
 
-const logAndExit = error => {
-	console.error(error)
-	process.exit(1)
-}
-
-const [user, password] = [process.env.OPENDATA_OEPNV_EMAIL, process.env.OPENDATA_OEPNV_PASSWORD]
-if (typeof user !== 'string' || user.length === 0) logAndExit('env.OPENDATA_OEPNV_EMAIL must be a non-empty string')
-if (typeof password !== 'string' || password.length === 0) logAndExit('env.OPENDATA_OEPNV_PASSWORD must be a non-empty string')
-
-const gtfs = () => {
+export const gtfs = async (user, password) => {
 	const datasetName = 'deutschlandweite-sollfahrplandaten-gtfs'
 	const isMatchingFile = name => name.endsWith('_fahrplaene_gesamtdeutschland_gtfs.zip')
-	fetchAndOutput(user, password, datasetName, isMatchingFile).catch(logAndExit)
+	await fetchAndOutput(user, password, datasetName, isMatchingFile)
 }
 
-const netex = () => {
+export const netex = async (user, password) => {
 	const datasetName = 'deutschlandweite-sollfahrplandaten'
 	const isMatchingFile = name => name.endsWith('_fahrplaene_gesamtdeutschland.zip')
-	fetchAndOutput(user, password, datasetName, isMatchingFile).catch(logAndExit)
+	await fetchAndOutput(user, password, datasetName, isMatchingFile)
 }
 
-const zhv = () => {
+export const zhv = async (user, password) => {
 	const datasetName = 'deutschlandweite-haltestellendaten'
 	const isMatchingFile = name => name.endsWith('_zHV_gesamt.zip')
-	fetchAndOutput(user, password, datasetName, isMatchingFile).catch(logAndExit)
+	await fetchAndOutput(user, password, datasetName, isMatchingFile)
 }
-
-module.exports = { gtfs, netex, zhv }
