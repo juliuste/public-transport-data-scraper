@@ -1,11 +1,11 @@
 {
-	"name": "opendata-oepnv",
+	"name": "public-transport-feed-scraper",
 	"version": "0.0.0",
 	"private": true,
 	"description": "Scraper that re-publishes official german public transport datasets with stable URLs.",
-	"homepage": "https://github.com/juliuste/opendata-oepnv",
-	"bugs": "https://github.com/juliuste/opendata-oepnv/issues",
-	"repository": "juliuste/opendata-oepnv",
+	"homepage": "https://github.com/juliuste/public-transport-feed-scraper",
+	"bugs": "https://github.com/juliuste/public-transport-feed-scraper/issues",
+	"repository": "juliuste/public-transport-feed-scraper",
 	"license": "ISC",
 	"author": "Julius Tens <mail@juliustens.eu>",
 	"scripts": {
