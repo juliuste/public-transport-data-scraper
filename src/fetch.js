@@ -27,6 +27,11 @@ const main = async () => {
 			return
 		}
 	}
+	if (dataset === 'DE_HVV_GTFS') {
+		const { hvvGtfs } = await import('./scrapers/hvv.js')
+		await hvvGtfs()
+		return
+	}
 	throw new Error(`unknown dataset: ${dataset}`)
 }
 
