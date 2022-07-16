@@ -86,7 +86,7 @@ jobs:
       run: |
         set -e;
         npm run fetch-de-gtfs;
-        currentobj=$(aws s3api head-object --bucket $DO_SPACES_BUCKET_NAME --key gtfs-germany.zip);
+        currentobj=$(aws s3api head-object --bucket $DO_SPACES_BUCKET_NAME --key gtfs-germany.zip || echo 'not-yet-existing');
         newhash=$(cat de-gtfs.zip | md5sum);
         if [ $(echo $currentobj | grep $newhash | wc -l) -ne 1 ]
         then
@@ -104,7 +104,7 @@ jobs:
       run: |
         set -e;
         npm run fetch-de-netex;
-        currentobj=$(aws s3api head-object --bucket $DO_SPACES_BUCKET_NAME --key netex-germany.zip);
+        currentobj=$(aws s3api head-object --bucket $DO_SPACES_BUCKET_NAME --key netex-germany.zip || echo 'not-yet-existing');
         newhash=$(cat de-netex.zip | md5sum);
         if [ $(echo $currentobj | grep $newhash | wc -l) -ne 1 ]
         then
@@ -122,7 +122,7 @@ jobs:
       run: |
         set -e;
         npm run fetch-de-zhv;
-        currentobj=$(aws s3api head-object --bucket $DO_SPACES_BUCKET_NAME --key zhv.zip);
+        currentobj=$(aws s3api head-object --bucket $DO_SPACES_BUCKET_NAME --key zhv.zip || echo 'not-yet-existing');
         newhash=$(cat de-zhv.zip | md5sum);
         if [ $(echo $currentobj | grep $newhash | wc -l) -ne 1 ]
         then
@@ -140,7 +140,7 @@ jobs:
       run: |
         set -e;
         npm run fetch-de-nrw-gtfs;
-        currentobj=$(aws s3api head-object --bucket $DO_SPACES_BUCKET_NAME --key de/nrw-gtfs.zip);
+        currentobj=$(aws s3api head-object --bucket $DO_SPACES_BUCKET_NAME --key de/nrw-gtfs.zip || echo 'not-yet-existing');
         newhash=$(cat de-nrw-gtfs.zip | md5sum);
         if [ $(echo $currentobj | grep $newhash | wc -l) -ne 1 ]
         then
