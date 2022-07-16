@@ -57,10 +57,10 @@ jobs:
           endpoint_url = https://fra1.digitaloceanspaces.com
           signature_version = s3v4
           max_concurrent_requests = 100
-          max_queue_size = 1000
-          multipart_threshold = 1000MB
+          max_queue_size = 2000
+          multipart_threshold = 2000MB
           # Edit the multipart_chunksize value according to the file sizes that you want to upload. The present configuration allows to upload files up to 10 GB (100 requests * 10MB). For example setting it to 5GB allows you to upload files up to 5TB.
-          multipart_chunksize = 1000MB
+          multipart_chunksize = 2000MB
         s3api =
           endpoint_url = https://fra1.digitaloceanspaces.com
         " > ~/.aws/config;
