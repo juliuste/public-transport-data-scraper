@@ -15,7 +15,7 @@
 		"lint": "eslint src",
 		"fetch-de-gtfs": "DATASET=DE_GTFS FILE_NAME=de-gtfs.zip MINIMUM_SIZE_MB=100 ./src/run.sh",
 		"fetch-de-netex": "DATASET=DE_NETEX FILE_NAME=de-netex.zip MINIMUM_SIZE_MB=500 ./src/run.sh",
-		"fetch-de-nrw-gtfs": "DATASET=DE_NRW_GTFS FILE_NAME=de-nwr-gtfs.zip MINIMUM_SIZE_MB=30 ./src/run.sh",
+		"fetch-de-nrw-gtfs": "DATASET=DE_NRW_GTFS FILE_NAME=de-nrw-gtfs.zip MINIMUM_SIZE_MB=30 ./src/run.sh",
 		"fetch-de-zhv": "DATASET=DE_ZHV FILE_NAME=de-zhv.zip MINIMUM_SIZE_MB=10 ./src/run.sh",
 		"test": "npm run lint && npm run check-deps"
 	},
