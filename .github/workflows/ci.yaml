@@ -86,11 +86,11 @@ jobs:
       run: |
         set -e;
         npm run fetch-de-gtfs;
-        currentobj=$(aws s3api head-object --bucket $DO_SPACES_BUCKET_NAME --key gtfs-germany.zip || echo 'not-yet-existing');
+        currentobj=$(aws s3api head-object --bucket $DO_SPACES_BUCKET_NAME --key de/gtfs.zip || echo 'not-yet-existing');
         newhash=$(cat de-gtfs.zip | md5sum);
         if [ $(echo $currentobj | grep $newhash | wc -l) -ne 1 ]
         then
-          aws s3 cp --acl public-read de-gtfs.zip s3://"$DO_SPACES_BUCKET_NAME"/gtfs-germany.zip
+          aws s3 cp --acl public-read de-gtfs.zip s3://"$DO_SPACES_BUCKET_NAME"/de/gtfs.zip
         else
           echo 'file unchanged, skipping.'
         fi;
@@ -104,11 +104,11 @@ jobs:
       run: |
         set -e;
         npm run fetch-de-netex;
-        currentobj=$(aws s3api head-object --bucket $DO_SPACES_BUCKET_NAME --key netex-germany.zip || echo 'not-yet-existing');
+        currentobj=$(aws s3api head-object --bucket $DO_SPACES_BUCKET_NAME --key de/netex.zip || echo 'not-yet-existing');
         newhash=$(cat de-netex.zip | md5sum);
         if [ $(echo $currentobj | grep $newhash | wc -l) -ne 1 ]
         then
-          aws s3 cp --acl public-read de-netex.zip s3://"$DO_SPACES_BUCKET_NAME"/netex-germany.zip
+          aws s3 cp --acl public-read de-netex.zip s3://"$DO_SPACES_BUCKET_NAME"/de/netex.zip
         else
           echo 'file unchanged, skipping.'
         fi;
@@ -122,11 +122,11 @@ jobs:
       run: |
         set -e;
         npm run fetch-de-zhv;
-        currentobj=$(aws s3api head-object --bucket $DO_SPACES_BUCKET_NAME --key zhv.zip || echo 'not-yet-existing');
+        currentobj=$(aws s3api head-object --bucket $DO_SPACES_BUCKET_NAME --key de/zhv.zip || echo 'not-yet-existing');
         newhash=$(cat de-zhv.zip | md5sum);
         if [ $(echo $currentobj | grep $newhash | wc -l) -ne 1 ]
         then
-          aws s3 cp --acl public-read de-zhv.zip s3://"$DO_SPACES_BUCKET_NAME"/zhv.zip
+          aws s3 cp --acl public-read de-zhv.zip s3://"$DO_SPACES_BUCKET_NAME"/de/zhv.zip
         else
           echo 'file unchanged, skipping.'
         fi;
