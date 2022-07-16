@@ -3,9 +3,9 @@
 	"version": "0.0.0",
 	"private": true,
 	"description": "Scraper that re-publishes official german public transport datasets with stable URLs.",
-	"homepage": "https://github.com/public-transport/opendata-oepnv",
-	"bugs": "https://github.com/public-transport/opendata-oepnv/issues",
-	"repository": "public-transport/opendata-oepnv",
+	"homepage": "https://github.com/juliuste/opendata-oepnv",
+	"bugs": "https://github.com/juliuste/opendata-oepnv/issues",
+	"repository": "juliuste/opendata-oepnv",
 	"license": "ISC",
 	"author": "Julius Tens <mail@juliustens.eu>",
 	"scripts": {
