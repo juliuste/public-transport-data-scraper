@@ -180,3 +180,19 @@ jobs:
         else
           echo 'file unchanged, skipping.'
         fi;
+
+    - name: "Fetch and upload feed: LU_GTFS"
+      if: ${{ success() || failure() }} # this should allow the other steps to run, but should still mark the workflow as failing
+      env:
+        DO_SPACES_BUCKET_NAME: ${{ secrets.DO_SPACES_BUCKET_NAME }}
+      run: |
+        set -e;
+        npm run fetch-lu-gtfs;
+        currentobj=$(aws s3api head-object --bucket $DO_SPACES_BUCKET_NAME --key lu/gtfs.zip || echo 'not-yet-existing');
+        newhash=$(cat lu-gtfs.zip | md5sum);
+        if [ $(echo $currentobj | grep $newhash | wc -l) -ne 1 ]
+        then
+          aws s3 cp --acl public-read lu-gtfs.zip s3://"$DO_SPACES_BUCKET_NAME"/lu/gtfs.zip
+        else
+          echo 'file unchanged, skipping.'
+        fi;
