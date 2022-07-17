@@ -1,7 +1,7 @@
 import got from 'got'
 
 export const hvvGtfs = async () => {
-	const response = await got.post(new URL('https://suche.transparenz.hamburg.de/api/3/action/package_search?q=gtfs&sort=publishing_date+desc%2Ctitle_sort+asc&rows=1')).json()
+	const response = await got.get(new URL('https://suche.transparenz.hamburg.de/api/3/action/package_search?q=gtfs&sort=publishing_date+desc%2Ctitle_sort+asc&rows=1')).json()
 	const item = response?.result?.results[0]
 	if (!item || item.author !== 'Hamburger Verkehrsverbund GmbH') throw new Error('no matching dataset found')
 	if (item.license_id !== 'dl-de-by-2.0') throw new Error('unexpected license')
