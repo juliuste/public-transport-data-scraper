@@ -13,6 +13,7 @@ Dataset | License | Attribution | Stable URL
 [Hamburger Verkehrsverbund (HVV) GTFS feed](https://suche.transparenz.hamburg.de/dataset?q=hvv%20gtfs&sort=score+desc%2Ctitle_sort+asc&esq_not_all_versions=true) (🇩🇪) | [DL-DE BY 2.0](https://www.govdata.de/dl-de/by-2-0) | [Hamburger Verkehrsverbund GmbH](https://www.hvv.de/) | [latest](https://scraped.data.public-transport.earth/de/hvv-gtfs.zip)
 [Israel-wide GTFS feed](https://www.gov.il/he/Departments/General/gtfs_general_transit_feed_specifications) [(docs)](https://www.gov.il/BlobFolder/generalpage/gtfs_general_transit_feed_specifications/he/GTFS_Developer_Information_2021.08.03.pdf) (🇮🇱) | _Unknown_ | [National Authority for Public Transport](https://www.gov.il/he/departments/public_transportion_authority/govil-landing-page) | [latest](https://scraped.data.public-transport.earth/il/gtfs.zip)
 [Luxembourg-wide GTFS feed](https://data.public.lu/en/datasets/horaires-et-arrets-des-transport-publics-gtfs/) (🇱🇺) | [CC-BY 4.0](https://creativecommons.org/licenses/by/4.0/deed.de) | [Administration des transports publics](https://mmtp.gouvernement.lu/de/annuaire.html?idMin=7854) | [latest](https://scraped.data.public-transport.earth/lu/gtfs.zip)
+[Sweden-wide GTFS feed](https://www.trafiklab.se/api/trafiklab-apis/gtfs-sverige-2/) (🇸🇪) | [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/deed.en) | [Trafiklab](https://www.trafiklab.se/) | [latest](https://scraped.data.public-transport.earth/se/gtfs.zip)
 
 ## Contributing
 

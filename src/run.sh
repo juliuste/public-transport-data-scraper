@@ -10,6 +10,8 @@ MINIMUM_SIZE_BYTES=$((1024 * 1024 * $MINIMUM_SIZE_MB))
 
 if [[ $DATASET == "IL_GTFS" ]]; then
 	curl --output $FILE_PATH 'ftp://gtfs.mot.gov.il/israel-public-transportation.zip'
+elif [[ $DATASET == "SE_GTFS" ]]; then
+	curl --output $FILE_PATH -L "https://api.resrobot.se/gtfs/sweden.zip?key=$TRAFIKLAB_API_KEY"
 else
 	node $DIRECTORY/fetch.js > $FILE_PATH;
 fi

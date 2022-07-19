@@ -20,6 +20,7 @@
 		"fetch-de-zhv": "DATASET=DE_ZHV FILE_NAME=de-zhv.zip MINIMUM_SIZE_MB=10 ./src/run.sh",
 		"fetch-il-gtfs": "DATASET=IL_GTFS FILE_NAME=il-gtfs.zip MINIMUM_SIZE_MB=100 ./src/run.sh",
 		"fetch-lu-gtfs": "DATASET=LU_GTFS FILE_NAME=lu-gtfs.zip MINIMUM_SIZE_MB=3 ./src/run.sh",
+		"fetch-se-gtfs": "DATASET=SE_GTFS FILE_NAME=se-gtfs.zip MINIMUM_SIZE_MB=50 ./src/run.sh",
 		"test": "npm run lint && npm run check-deps"
 	},
 	"dependencies": {
