@@ -12,10 +12,10 @@ jobs:
     steps:
     - name: Checkout main
       uses: actions/checkout@v2
-    - name: Set up Node.js 16
+    - name: Set up Node.js 18
       uses: actions/setup-node@v1
       with:
-        node-version: 16
+        node-version: 18
     - name: Install dependencies
       run: npx pnpm i
     - name: Run tests
@@ -71,10 +71,10 @@ jobs:
         DO_SPACES_BUCKET_NAME: ${{ secrets.DO_SPACES_BUCKET_NAME }}
       run: aws s3api put-bucket-versioning  --bucket $DO_SPACES_BUCKET_NAME --versioning-configuration 'Status=Enabled'
 
-    - name: Set up Node.js 16
+    - name: Set up Node.js 18
       uses: actions/setup-node@v1
       with:
-        node-version: 16
+        node-version: 18
     - name: Install dependencies
       run: npx pnpm i
 
