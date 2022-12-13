@@ -13,13 +13,14 @@ jobs:
     - name: Checkout main
       uses: actions/checkout@v2
     - name: Set up Node.js 18
-      uses: actions/setup-node@v1
+      uses: actions/setup-node@v3
       with:
         node-version: 18
+        cache: pnpm
     - name: Install dependencies
-      run: npx pnpm i
+      run: pnpm i
     - name: Run tests
-      run: npx pnpm test
+      run: pnpm test
       env:
         CI: true
 
@@ -72,11 +73,12 @@ jobs:
       run: aws s3api put-bucket-versioning  --bucket $DO_SPACES_BUCKET_NAME --versioning-configuration 'Status=Enabled'
 
     - name: Set up Node.js 18
-      uses: actions/setup-node@v1
+      uses: actions/setup-node@v3
       with:
         node-version: 18
+        cache: pnpm
     - name: Install dependencies
-      run: npx pnpm i
+      run: pnpm i
 
     - name: "Fetch and upload feed: DE_GTFS"
       if: ${{ success() }} # this should allow the other steps to run, but should still mark the workflow as failing
