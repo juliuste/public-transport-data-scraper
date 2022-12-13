@@ -11,8 +11,8 @@ export const luxembourgGtfs = async () => {
 	const { published, url } = latest
 	if (!url || !published) throw new Error('missing resource properties')
 
-	// throw if latest file is older than 10 days
-	if (+new Date() - (+new Date(published)) > 10 * 24 * 60 * 60 * 1000) throw new Error(`latest dataset seems to be outdated: ${published}`)
+	// throw if latest file is older than 20 days
+	if (+new Date() - (+new Date(published)) > 20 * 24 * 60 * 60 * 1000) throw new Error(`latest dataset seems to be outdated: ${published}`)
 
 	const stream = await got.stream.get(url)
 	return stream.pipe(process.stdout)
