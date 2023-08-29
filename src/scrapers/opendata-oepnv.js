@@ -23,27 +23,34 @@ const extractUrlFromResponse = (html, isMatchingFile, selectBestMatch) => {
 	return url
 }
 
-const fetchAndOutput = async (user, password, organisationPath, datasetName, isMatchingFile, selectBestMatch = throwOnMultipleOrNoMatches) => {
-	const url = new URL(organisationPath, 'https://www.opendata-oepnv.de/ht/de/organisation/')
-	url.searchParams.append('tx_vrrkit_view[dataset_name]', datasetName)
-	url.searchParams.append('tx_vrrkit_view[action]', 'details')
-	url.searchParams.append('tx_vrrkit_view[controller]', 'View')
-
+const fetchCookie = async (user, password) => {
+	const url = new URL('https://www.opendata-oepnv.de/ht/de/willkommen')
+	url.searchParams.append('tx_felogin_login[action]', 'login')
+	url.searchParams.append('tx_felogin_login[controller]', 'Login')
+	url.searchParams.append('cHash', '99c35a06ebc0db4f37f0bb93048bb79b')
 	const response = await got.post(url, {
 		form: {
 			user,
 			pass: password,
 			submit: 'Anmelden',
 			logintype: 'login',
-			pid: 174,
-			'tx_felogin_pi1[noredirect]': 0,
-			referer: url.toString(),
+			pid: '174@d6f42d5376399b9d6eee5cbcb5a06dcb1b489387',
 		},
 	})
-
 	const cookie = (response.headers['set-cookie'] || []).find(c => c.includes('fe_typo_user'))
 	if (!cookie) throw new Error('cookie not found. internal error or invalid credentials')
+	return cookie
+}
 
+const fetchAndOutput = async (user, password, organisationPath, datasetName, isMatchingFile, selectBestMatch = throwOnMultipleOrNoMatches) => {
+	const cookie = await fetchCookie(user, password)
+
+	const url = new URL(organisationPath, 'https://www.opendata-oepnv.de/ht/de/organisation/')
+	url.searchParams.append('tx_vrrkit_view[dataset_name]', datasetName)
+	url.searchParams.append('tx_vrrkit_view[action]', 'details')
+	url.searchParams.append('tx_vrrkit_view[controller]', 'View')
+
+	const response = await got.get(url, { headers: { Cookie: cookie } })
 	const fileUrl = extractUrlFromResponse(response.body, isMatchingFile, selectBestMatch)
 
 	const stream = await got.stream.get(fileUrl, { headers: { Cookie: cookie } })
