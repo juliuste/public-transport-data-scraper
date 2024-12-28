@@ -140,6 +140,23 @@ jobs:
           echo 'file unchanged, skipping.'
         fi;
 
+    - name: "Generate linked data: DE_ZHV"
+      # todo: do not run if processing the dataset failed
+      if: ${{ success() }} # this should allow the other steps to run, but should still mark the workflow as failing
+      env:
+        DO_SPACES_BUCKET_NAME: ${{ secrets.DO_SPACES_BUCKET_NAME }}
+      run: |
+        set -e;
+        ./src/linked-data/zhv-de/index.sh
+        currentobj=$(aws s3api head-object --bucket $DO_SPACES_BUCKET_NAME --key de/zhv.ttl.gz || echo 'not-yet-existing');
+        newhash=$(cat ./src/linked-data/zhv-de/data/output.ttl.gz | md5sum);
+        if [ $(echo $currentobj | grep $newhash | wc -l) -ne 1 ]
+        then
+          aws s3 cp --acl public-read ./src/linked-data/zhv-de/data/output.ttl.gz s3://"$DO_SPACES_BUCKET_NAME"/de/zhv.ttl.gz
+        else
+          echo 'file unchanged, skipping.'
+        fi;
+
     - name: "Fetch and upload feed: DE_NRW_GTFS"
       if: ${{ success() || failure() }} # this should allow the other steps to run, but should still mark the workflow as failing
       env:

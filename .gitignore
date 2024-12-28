@@ -10,4 +10,5 @@ shrinkwrap.yaml
 pnpm-lock.yaml
 dist
 
+data
 *.zip

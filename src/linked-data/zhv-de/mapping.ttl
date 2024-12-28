@@ -1,0 +1,56 @@
+@prefix bahnhof: <https://lod.bahnhof.de/vocabulary/db/>.
+@prefix codeforde: <https://lod.codefor.de/vocabulary/codeforde/>.
+@prefix dct: <http://purl.org/dc/terms/>.
+@prefix dbo: <https://dbpedia.org/ontology/>.
+@prefix foaf: <http://xmlns.com/foaf/0.1/>.
+@prefix geo: <http://www.opengis.net/ont/geosparql#>.
+@prefix gn: <http://www.geonames.org/ontology#>.
+@prefix juso: <http://rdfs.co/juso/>.
+@prefix netex: <https://lod.bahnhof.de/vocabulary/netex/>.
+@prefix owl: <http://www.w3.org/2002/07/owl#>.
+@prefix ql: <http://semweb.mmlab.be/ns/ql#>.
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>.
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>.
+@prefix rml: <http://semweb.mmlab.be/ns/rml#>.
+@prefix rr: <http://www.w3.org/ns/r2rml#>.
+@prefix schema: <http://schema.org/>.
+@prefix status: <http://www.w3.org/2003/06/sw-vocab-status/ns#>.
+@prefix wdt: <http://www.wikidata.org/prop/direct/>.
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#>.
+
+# level 1 (stop place)
+
+[ a rr:TriplesMap ]
+  rml:logicalSource [
+    rml:source "data/source.json";
+    rml:referenceFormulation ql:JSONPath;
+    rml:iterator "$[?(@.Type == 'S')]"
+  ];
+  rr:subjectMap [
+    rr:template "resource/by-key/ifopt/{.DHID}";
+    rr:class netex:StopPlace
+  ];
+	rr:predicateObjectMap [
+    rr:predicate netex:topographicPlace;
+    rr:objectMap [
+      rr:termType rr:IRI;
+      rr:template "resource/by-key/ags/{.MunicipalityCode}"
+    ]
+  ], [
+    rr:predicate bahnhof:ifoptStopId;
+    rr:objectMap [
+      rr:datatype xsd:string;
+      rr:termType rr:Literal;
+      rml:reference "$.DHID"
+    ]
+  ], [
+		rr:predicate netex:name;
+    rr:objectMap [
+      rr:datatype xsd:string;
+      rr:termType rr:Literal;
+      rml:reference "$.Name"
+    ]
+	].
+	# todo: other attributes
+
+# todo: level 2 (quay - platform), level 3 (quay - platform edge)
