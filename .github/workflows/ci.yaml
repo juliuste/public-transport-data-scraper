@@ -8,18 +8,18 @@ on:
     - cron: '0 2 * * *'
 jobs:
   test:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
     - name: Checkout main
-      uses: actions/checkout@v3
-    - uses: pnpm/action-setup@v2
+      uses: actions/checkout@v4
+    - uses: pnpm/action-setup@v3
       name: Set up pnpm
       with:
-        version: 7
-    - name: Set up Node.js 18
-      uses: actions/setup-node@v3
+        version: 8
+    - name: Set up Node
+      uses: actions/setup-node@v4
       with:
-        node-version: 18
+        node-version: 20
     - name: Install dependencies
       run: pnpm install
     - name: Run tests
@@ -28,62 +28,49 @@ jobs:
         CI: true
 
   fetch-and-publish:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
+    environment: main
     needs: test
     if: github.ref == 'refs/heads/main'
     steps:
     - name: Checkout main
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
     - name: Set up Python 3
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v5
       with:
         python-version: 3
     - name: Install awscli
-      run: pip3 install awscli awscli-plugin-endpoint
-
+      run: pip3 install awscli
     - name: Set up awscli configuration
       env:
-        DO_SPACES_KEY: ${{ secrets.DO_SPACES_KEY }}
-        DO_SPACES_SECRET: ${{ secrets.DO_SPACES_SECRET }}
+        S3_ACCESS_KEY_ID: ${{ secrets.S3_ACCESS_KEY_ID }}
+        S3_SECRET_ACCESS_KEY: ${{ secrets.S3_SECRET_ACCESS_KEY }}
+        S3_ENDPOINT: ${{ secrets.S3_ENDPOINT }}
       run: |
         set -e;
         mkdir ~/.aws;
         echo "
         [default]
-        aws_access_key_id=$DO_SPACES_KEY
-        aws_secret_access_key=$DO_SPACES_SECRET
+        aws_access_key_id=$S3_ACCESS_KEY_ID
+        aws_secret_access_key=$S3_SECRET_ACCESS_KEY
         " > ~/.aws/credentials;
         echo "
-        [plugins]
-        endpoint = awscli_plugin_endpoint
         [default]
-        region = fr-par
+        endpoint_url = $S3_ENDPOINT
         s3 =
-          endpoint_url = https://fra1.digitaloceanspaces.com
-          signature_version = s3v4
-          max_concurrent_requests = 100
-          max_queue_size = 2000
           multipart_threshold = 2000MB
-          # Edit the multipart_chunksize value according to the file sizes that you want to upload. The present configuration allows to upload files up to 10 GB (100 requests * 10MB). For example setting it to 5GB allows you to upload files up to 5TB.
           multipart_chunksize = 2000MB
-        s3api =
-          endpoint_url = https://fra1.digitaloceanspaces.com
         " > ~/.aws/config;
 
-    - name: Ensure that bucket versioning is enabled
-      env:
-        DO_SPACES_BUCKET_NAME: ${{ secrets.DO_SPACES_BUCKET_NAME }}
-      run: aws s3api put-bucket-versioning  --bucket $DO_SPACES_BUCKET_NAME --versioning-configuration 'Status=Enabled'
-
-    - uses: pnpm/action-setup@v2
+    - uses: pnpm/action-setup@v3
       name: Set up pnpm
       with:
-        version: 7
-    - name: Set up Node.js 18
-      uses: actions/setup-node@v3
+        version: 8
+    - name: Set up Node
+      uses: actions/setup-node@v4
       with:
-        node-version: 18
-    - name: Install dependencies
+        node-version: 20
+    - name: Install node dependencies
       run: pnpm install
 
     - name: "Fetch and upload feed: DE_GTFS"
@@ -91,15 +78,15 @@ jobs:
       env:
         OPENDATA_OEPNV_EMAIL: ${{ secrets.OPENDATA_OEPNV_EMAIL }}
         OPENDATA_OEPNV_PASSWORD: ${{ secrets.OPENDATA_OEPNV_PASSWORD }}
-        DO_SPACES_BUCKET_NAME: ${{ secrets.DO_SPACES_BUCKET_NAME }}
+        S3_BUCKET_NAME: ${{ secrets.S3_BUCKET_NAME }}
       run: |
         set -e;
         npm run fetch-de-gtfs;
-        currentobj=$(aws s3api head-object --bucket $DO_SPACES_BUCKET_NAME --key de/gtfs.zip || echo 'not-yet-existing');
+        currentobj=$(aws s3api head-object --bucket $S3_BUCKET_NAME --key de/gtfs.zip || echo 'not-yet-existing');
         newhash=$(cat de-gtfs.zip | md5sum);
         if [ $(echo $currentobj | grep $newhash | wc -l) -ne 1 ]
         then
-          aws s3 cp --acl public-read de-gtfs.zip s3://"$DO_SPACES_BUCKET_NAME"/de/gtfs.zip
+          aws s3 cp --acl public-read de-gtfs.zip s3://"$S3_BUCKET_NAME"/de/gtfs.zip
         else
           echo 'file unchanged, skipping.'
         fi;
@@ -109,15 +96,15 @@ jobs:
       env:
         OPENDATA_OEPNV_EMAIL: ${{ secrets.OPENDATA_OEPNV_EMAIL }}
         OPENDATA_OEPNV_PASSWORD: ${{ secrets.OPENDATA_OEPNV_PASSWORD }}
-        DO_SPACES_BUCKET_NAME: ${{ secrets.DO_SPACES_BUCKET_NAME }}
+        S3_BUCKET_NAME: ${{ secrets.S3_BUCKET_NAME }}
       run: |
         set -e;
         npm run fetch-de-netex;
-        currentobj=$(aws s3api head-object --bucket $DO_SPACES_BUCKET_NAME --key de/netex.zip || echo 'not-yet-existing');
+        currentobj=$(aws s3api head-object --bucket $S3_BUCKET_NAME --key de/netex.zip || echo 'not-yet-existing');
         newhash=$(cat de-netex.zip | md5sum);
         if [ $(echo $currentobj | grep $newhash | wc -l) -ne 1 ]
         then
-          aws s3 cp --acl public-read de-netex.zip s3://"$DO_SPACES_BUCKET_NAME"/de/netex.zip
+          aws s3 cp --acl public-read de-netex.zip s3://"$S3_BUCKET_NAME"/de/netex.zip
         else
           echo 'file unchanged, skipping.'
         fi;
@@ -127,15 +114,15 @@ jobs:
       env:
         OPENDATA_OEPNV_EMAIL: ${{ secrets.OPENDATA_OEPNV_EMAIL }}
         OPENDATA_OEPNV_PASSWORD: ${{ secrets.OPENDATA_OEPNV_PASSWORD }}
-        DO_SPACES_BUCKET_NAME: ${{ secrets.DO_SPACES_BUCKET_NAME }}
+        S3_BUCKET_NAME: ${{ secrets.S3_BUCKET_NAME }}
       run: |
         set -e;
         npm run fetch-de-zhv;
-        currentobj=$(aws s3api head-object --bucket $DO_SPACES_BUCKET_NAME --key de/zhv.zip || echo 'not-yet-existing');
+        currentobj=$(aws s3api head-object --bucket $S3_BUCKET_NAME --key de/zhv.zip || echo 'not-yet-existing');
         newhash=$(cat de-zhv.zip | md5sum);
         if [ $(echo $currentobj | grep $newhash | wc -l) -ne 1 ]
         then
-          aws s3 cp --acl public-read de-zhv.zip s3://"$DO_SPACES_BUCKET_NAME"/de/zhv.zip
+          aws s3 cp --acl public-read de-zhv.zip s3://"$S3_BUCKET_NAME"/de/zhv.zip
         else
           echo 'file unchanged, skipping.'
         fi;
@@ -144,15 +131,15 @@ jobs:
       # todo: do not run if processing the dataset failed
       if: ${{ success() }} # this should allow the other steps to run, but should still mark the workflow as failing
       env:
-        DO_SPACES_BUCKET_NAME: ${{ secrets.DO_SPACES_BUCKET_NAME }}
+        S3_BUCKET_NAME: ${{ secrets.S3_BUCKET_NAME }}
       run: |
         set -e;
         ./src/linked-data/zhv-de/index.sh
-        currentobj=$(aws s3api head-object --bucket $DO_SPACES_BUCKET_NAME --key de/zhv.ttl.gz || echo 'not-yet-existing');
+        currentobj=$(aws s3api head-object --bucket $S3_BUCKET_NAME --key de/zhv.ttl.gz || echo 'not-yet-existing');
         newhash=$(cat ./src/linked-data/zhv-de/data/output.ttl.gz | md5sum);
         if [ $(echo $currentobj | grep $newhash | wc -l) -ne 1 ]
         then
-          aws s3 cp --acl public-read ./src/linked-data/zhv-de/data/output.ttl.gz s3://"$DO_SPACES_BUCKET_NAME"/de/zhv.ttl.gz
+          aws s3 cp --acl public-read ./src/linked-data/zhv-de/data/output.ttl.gz s3://"$S3_BUCKET_NAME"/de/zhv.ttl.gz
         else
           echo 'file unchanged, skipping.'
         fi;
@@ -162,15 +149,15 @@ jobs:
       env:
         OPENDATA_OEPNV_EMAIL: ${{ secrets.OPENDATA_OEPNV_EMAIL }}
         OPENDATA_OEPNV_PASSWORD: ${{ secrets.OPENDATA_OEPNV_PASSWORD }}
-        DO_SPACES_BUCKET_NAME: ${{ secrets.DO_SPACES_BUCKET_NAME }}
+        S3_BUCKET_NAME: ${{ secrets.S3_BUCKET_NAME }}
       run: |
         set -e;
         npm run fetch-de-nrw-gtfs;
-        currentobj=$(aws s3api head-object --bucket $DO_SPACES_BUCKET_NAME --key de/nrw-gtfs.zip || echo 'not-yet-existing');
+        currentobj=$(aws s3api head-object --bucket $S3_BUCKET_NAME --key de/nrw-gtfs.zip || echo 'not-yet-existing');
         newhash=$(cat de-nrw-gtfs.zip | md5sum);
         if [ $(echo $currentobj | grep $newhash | wc -l) -ne 1 ]
         then
-          aws s3 cp --acl public-read de-nrw-gtfs.zip s3://"$DO_SPACES_BUCKET_NAME"/de/nrw-gtfs.zip
+          aws s3 cp --acl public-read de-nrw-gtfs.zip s3://"$S3_BUCKET_NAME"/de/nrw-gtfs.zip
         else
           echo 'file unchanged, skipping.'
         fi;
@@ -178,15 +165,15 @@ jobs:
     - name: "Fetch and upload feed: DE_HVV_GTFS"
       if: ${{ success() || failure() }} # this should allow the other steps to run, but should still mark the workflow as failing
       env:
-        DO_SPACES_BUCKET_NAME: ${{ secrets.DO_SPACES_BUCKET_NAME }}
+        S3_BUCKET_NAME: ${{ secrets.S3_BUCKET_NAME }}
       run: |
         set -e;
         npm run fetch-de-hvv-gtfs;
-        currentobj=$(aws s3api head-object --bucket $DO_SPACES_BUCKET_NAME --key de/hvv-gtfs.zip || echo 'not-yet-existing');
+        currentobj=$(aws s3api head-object --bucket $S3_BUCKET_NAME --key de/hvv-gtfs.zip || echo 'not-yet-existing');
         newhash=$(cat de-hvv-gtfs.zip | md5sum);
         if [ $(echo $currentobj | grep $newhash | wc -l) -ne 1 ]
         then
-          aws s3 cp --acl public-read de-hvv-gtfs.zip s3://"$DO_SPACES_BUCKET_NAME"/de/hvv-gtfs.zip
+          aws s3 cp --acl public-read de-hvv-gtfs.zip s3://"$S3_BUCKET_NAME"/de/hvv-gtfs.zip
         else
           echo 'file unchanged, skipping.'
         fi;
@@ -194,15 +181,15 @@ jobs:
     - name: "Fetch and upload feed: LU_GTFS"
       if: ${{ success() || failure() }} # this should allow the other steps to run, but should still mark the workflow as failing
       env:
-        DO_SPACES_BUCKET_NAME: ${{ secrets.DO_SPACES_BUCKET_NAME }}
+        S3_BUCKET_NAME: ${{ secrets.S3_BUCKET_NAME }}
       run: |
         set -e;
         npm run fetch-lu-gtfs;
-        currentobj=$(aws s3api head-object --bucket $DO_SPACES_BUCKET_NAME --key lu/gtfs.zip || echo 'not-yet-existing');
+        currentobj=$(aws s3api head-object --bucket $S3_BUCKET_NAME --key lu/gtfs.zip || echo 'not-yet-existing');
         newhash=$(cat lu-gtfs.zip | md5sum);
         if [ $(echo $currentobj | grep $newhash | wc -l) -ne 1 ]
         then
-          aws s3 cp --acl public-read lu-gtfs.zip s3://"$DO_SPACES_BUCKET_NAME"/lu/gtfs.zip
+          aws s3 cp --acl public-read lu-gtfs.zip s3://"$S3_BUCKET_NAME"/lu/gtfs.zip
         else
           echo 'file unchanged, skipping.'
         fi;
@@ -211,15 +198,15 @@ jobs:
       if: ${{ success() || failure() }} # this should allow the other steps to run, but should still mark the workflow as failing
       env:
         TRAFIKLAB_API_KEY: ${{ secrets.TRAFIKLAB_API_KEY }}
-        DO_SPACES_BUCKET_NAME: ${{ secrets.DO_SPACES_BUCKET_NAME }}
+        S3_BUCKET_NAME: ${{ secrets.S3_BUCKET_NAME }}
       run: |
         set -e;
         npm run fetch-se-gtfs;
-        currentobj=$(aws s3api head-object --bucket $DO_SPACES_BUCKET_NAME --key se/gtfs.zip || echo 'not-yet-existing');
+        currentobj=$(aws s3api head-object --bucket $S3_BUCKET_NAME --key se/gtfs.zip || echo 'not-yet-existing');
         newhash=$(cat se-gtfs.zip | md5sum);
         if [ $(echo $currentobj | grep $newhash | wc -l) -ne 1 ]
         then
-          aws s3 cp --acl public-read se-gtfs.zip s3://"$DO_SPACES_BUCKET_NAME"/se/gtfs.zip
+          aws s3 cp --acl public-read se-gtfs.zip s3://"$S3_BUCKET_NAME"/se/gtfs.zip
         else
           echo 'file unchanged, skipping.'
         fi;
