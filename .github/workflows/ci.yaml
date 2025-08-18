@@ -58,8 +58,8 @@ jobs:
         [default]
         endpoint_url = $S3_ENDPOINT
         s3 =
-          multipart_threshold = 2000MB
-          multipart_chunksize = 2000MB
+          multipart_threshold = 4GB
+          multipart_chunksize = 4GB
         " > ~/.aws/config;
 
     - uses: pnpm/action-setup@v3
