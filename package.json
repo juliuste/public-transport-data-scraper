@@ -24,7 +24,7 @@
 		"test": "npm run lint && npm run check-deps"
 	},
 	"dependencies": {
-		"cheerio": "1.0.0-rc.12",
+		"cheerio": "1.0.0",
 		"got": "^14.4.5",
 		"lodash": "^4.17.21",
 		"luxon": "^3.5.0"
