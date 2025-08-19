@@ -58,8 +58,8 @@ jobs:
         [default]
         endpoint_url = $S3_ENDPOINT
         s3 =
-          multipart_threshold = 512MB
-          multipart_chunksize = 512MB
+          multipart_threshold = 4GB
+          multipart_chunksize = 4GB
         " > ~/.aws/config;
 
     - uses: pnpm/action-setup@v3
@@ -86,7 +86,7 @@ jobs:
         newhash=$(cat de-gtfs.zip | md5sum);
         if [ $(echo $currentobj | grep $newhash | wc -l) -ne 1 ]
         then
-          aws s3 cp --acl public-read de-gtfs.zip s3://"$S3_BUCKET_NAME"/de/gtfs.zip
+          aws s3 cp --checksum-algorithm CRC32 --acl public-read de-gtfs.zip s3://"$S3_BUCKET_NAME"/de/gtfs.zip
         else
           echo 'file unchanged, skipping.'
         fi;
@@ -104,7 +104,7 @@ jobs:
         newhash=$(cat de-netex.zip | md5sum);
         if [ $(echo $currentobj | grep $newhash | wc -l) -ne 1 ]
         then
-          aws s3 cp --acl public-read de-netex.zip s3://"$S3_BUCKET_NAME"/de/netex.zip
+          aws s3 cp --checksum-algorithm CRC32 --acl public-read de-netex.zip s3://"$S3_BUCKET_NAME"/de/netex.zip
         else
           echo 'file unchanged, skipping.'
         fi;
@@ -122,7 +122,7 @@ jobs:
         newhash=$(cat de-zhv.zip | md5sum);
         if [ $(echo $currentobj | grep $newhash | wc -l) -ne 1 ]
         then
-          aws s3 cp --acl public-read de-zhv.zip s3://"$S3_BUCKET_NAME"/de/zhv.zip
+          aws s3 cp --checksum-algorithm CRC32 --acl public-read de-zhv.zip s3://"$S3_BUCKET_NAME"/de/zhv.zip
         else
           echo 'file unchanged, skipping.'
         fi;
@@ -139,7 +139,7 @@ jobs:
         newhash=$(cat ./src/linked-data/zhv-de/data/output.ttl.gz | md5sum);
         if [ $(echo $currentobj | grep $newhash | wc -l) -ne 1 ]
         then
-          aws s3 cp --acl public-read ./src/linked-data/zhv-de/data/output.ttl.gz s3://"$S3_BUCKET_NAME"/de/zhv.ttl.gz
+          aws s3 cp --checksum-algorithm CRC32 --acl public-read ./src/linked-data/zhv-de/data/output.ttl.gz s3://"$S3_BUCKET_NAME"/de/zhv.ttl.gz
         else
           echo 'file unchanged, skipping.'
         fi;
@@ -157,7 +157,7 @@ jobs:
         newhash=$(cat de-nrw-gtfs.zip | md5sum);
         if [ $(echo $currentobj | grep $newhash | wc -l) -ne 1 ]
         then
-          aws s3 cp --acl public-read de-nrw-gtfs.zip s3://"$S3_BUCKET_NAME"/de/nrw-gtfs.zip
+          aws s3 cp --checksum-algorithm CRC32 --acl public-read de-nrw-gtfs.zip s3://"$S3_BUCKET_NAME"/de/nrw-gtfs.zip
         else
           echo 'file unchanged, skipping.'
         fi;
@@ -173,7 +173,7 @@ jobs:
         newhash=$(cat de-hvv-gtfs.zip | md5sum);
         if [ $(echo $currentobj | grep $newhash | wc -l) -ne 1 ]
         then
-          aws s3 cp --acl public-read de-hvv-gtfs.zip s3://"$S3_BUCKET_NAME"/de/hvv-gtfs.zip
+          aws s3 cp --checksum-algorithm CRC32 --acl public-read de-hvv-gtfs.zip s3://"$S3_BUCKET_NAME"/de/hvv-gtfs.zip
         else
           echo 'file unchanged, skipping.'
         fi;
@@ -189,7 +189,7 @@ jobs:
         newhash=$(cat lu-gtfs.zip | md5sum);
         if [ $(echo $currentobj | grep $newhash | wc -l) -ne 1 ]
         then
-          aws s3 cp --acl public-read lu-gtfs.zip s3://"$S3_BUCKET_NAME"/lu/gtfs.zip
+          aws s3 cp --checksum-algorithm CRC32 --acl public-read lu-gtfs.zip s3://"$S3_BUCKET_NAME"/lu/gtfs.zip
         else
           echo 'file unchanged, skipping.'
         fi;
@@ -206,7 +206,7 @@ jobs:
         newhash=$(cat se-gtfs.zip | md5sum);
         if [ $(echo $currentobj | grep $newhash | wc -l) -ne 1 ]
         then
-          aws s3 cp --acl public-read se-gtfs.zip s3://"$S3_BUCKET_NAME"/se/gtfs.zip
+          aws s3 cp --checksum-algorithm CRC32 --acl public-read se-gtfs.zip s3://"$S3_BUCKET_NAME"/se/gtfs.zip
         else
           echo 'file unchanged, skipping.'
         fi;
