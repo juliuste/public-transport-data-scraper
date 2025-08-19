@@ -81,11 +81,12 @@ export const zhv = async (user, password) => {
 export const nrwGtfs = async (user, password) => {
 	const organisationPath = 'bundeslaender/nrw/startseite'
 	const datasetName = 'soll-fahrplandaten-nrw'
-	const isMatchingFile = name => /\/\d{8}_gtfs_nrw\.zip$/.test(name)
+	const isMatchingFile = name => /\/nrw-gtfs-\d{2}-\d{4}\.zip$/.test(name)
 	const selectBestMatch = urls => {
 		const urlsWithDate = urls.map(url => {
 			const fileName = basename(new URL(url).pathname)
-			const date = DateTime.fromFormat(fileName.slice(0, 8), 'yyyyMMdd').toJSDate()
+			const rawDate = `28-${fileName.slice(-11).slice(0, 7)}`
+			const date = DateTime.fromFormat(rawDate, 'dd-MM-yyyy').toJSDate()
 			return { date, url }
 		})
 		const latest = lodash.last(lodash.sortBy(urlsWithDate, ({ date }) => +date))
