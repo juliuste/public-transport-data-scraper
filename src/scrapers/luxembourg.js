@@ -5,14 +5,14 @@ export const luxembourgGtfs = async () => {
 	const response = await got.get(new URL('https://data.public.lu/api/1/datasets/gtfs')).json()
 	if (response?.license !== 'cc-by') throw new Error('unexpected license')
 
-	const [latest] = lodash.sortBy((response?.resources || []).filter(r => r?.format === 'zip'), r => -new Date(r?.published))
+	const [latest] = lodash.sortBy((response?.resources || []).filter(r => r?.format === 'zip'), r => -new Date(r?.created_at))
 	if (!latest) throw new Error('no matching dataset found')
 
-	const { published, url } = latest
-	if (!url || !published) throw new Error('missing resource properties')
+	const { created_at: createdAt, url } = latest
+	if (!url || !createdAt) throw new Error('missing resource properties')
 
 	// throw if latest file is older than 20 days
-	if (+new Date() - (+new Date(published)) > 20 * 24 * 60 * 60 * 1000) throw new Error(`latest dataset seems to be outdated: ${published}`)
+	if (+new Date() - (+new Date(createdAt)) > 20 * 24 * 60 * 60 * 1000) throw new Error(`latest dataset seems to be outdated: ${createdAt}`)
 
 	const stream = await got.stream.get(url)
 	return stream.pipe(process.stdout)
