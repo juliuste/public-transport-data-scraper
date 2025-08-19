@@ -37,6 +37,11 @@ const main = async () => {
 		await luxembourgGtfs()
 		return
 	}
+	if (dataset === 'LU_NETEX') {
+		const { luxembourgNetex } = await import('./scrapers/luxembourg.js')
+		await luxembourgNetex()
+		return
+	}
 	throw new Error(`unknown dataset: ${dataset}`)
 }
 

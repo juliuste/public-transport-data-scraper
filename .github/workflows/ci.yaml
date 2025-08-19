@@ -197,6 +197,22 @@ jobs:
           echo 'file unchanged, skipping.'
         fi;
 
+    - name: "Fetch and upload feed: LU_NETEX"
+      if: ${{ success() || failure() }} # this should allow the other steps to run, but should still mark the workflow as failing
+      env:
+        S3_BUCKET_NAME: ${{ secrets.S3_BUCKET_NAME }}
+      run: |
+        set -e;
+        npm run fetch-lu-netex;
+        currentobj=$(aws s3api head-object --bucket $S3_BUCKET_NAME --key lu/netex.zip || echo 'not-yet-existing');
+        newhash=$(cat lu-netex.zip | md5sum);
+        if [ $(echo $currentobj | grep $newhash | wc -l) -ne 1 ]
+        then
+          aws s3 cp --checksum-algorithm=CRC32 --acl public-read lu-netex.zip s3://"$S3_BUCKET_NAME"/lu/netex.zip
+        else
+          echo 'file unchanged, skipping.'
+        fi;
+
     - name: "Fetch and upload feed: SE_GTFS"
       if: ${{ success() || failure() }} # this should allow the other steps to run, but should still mark the workflow as failing
       env:
