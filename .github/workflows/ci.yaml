@@ -165,6 +165,8 @@ jobs:
     - name: "Fetch and upload feed: DE_HVV_GTFS"
       if: ${{ success() || failure() }} # this should allow the other steps to run, but should still mark the workflow as failing
       env:
+        OPENDATA_OEPNV_EMAIL: ${{ secrets.OPENDATA_OEPNV_EMAIL }}
+        OPENDATA_OEPNV_PASSWORD: ${{ secrets.OPENDATA_OEPNV_PASSWORD }}
         S3_BUCKET_NAME: ${{ secrets.S3_BUCKET_NAME }}
       run: |
         set -e;

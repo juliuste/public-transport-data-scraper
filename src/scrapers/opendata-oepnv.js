@@ -96,3 +96,22 @@ export const nrwGtfs = async (user, password) => {
 	}
 	await fetchAndOutput(user, password, organisationPath, datasetName, isMatchingFile, selectBestMatch)
 }
+
+export const hvvGtfs = async (user, password) => {
+	const organisationPath = 'verkehrsverbuende/hvv/startseite'
+	const datasetName = 'soll-fahrplandaten-hvv'
+	const isMatchingFile = name => /\/hvv_rohdaten_gtfs_fpl_\d{8}\.zip$/.test(name)
+	const selectBestMatch = urls => {
+		const urlsWithDate = urls.map(url => {
+			const fileName = basename(new URL(url).pathname)
+			const rawDate = `${fileName.slice(-12).slice(0, 8)}`
+			const date = DateTime.fromFormat(rawDate, 'yyyyMMdd').toJSDate()
+			return { date, url }
+		})
+		const latest = lodash.last(lodash.sortBy(urlsWithDate, ({ date }) => +date))
+		// throw if latest file is older than 45 days
+		if (+new Date() - (+latest.date) > 45 * 24 * 60 * 60 * 1000) throw new Error(`latest dataset seems to be outdated: ${latest.date}`)
+		return latest.url
+	}
+	await fetchAndOutput(user, password, organisationPath, datasetName, isMatchingFile, selectBestMatch)
+}
