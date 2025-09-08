@@ -26,6 +26,7 @@
 	"dependencies": {
 		"cheerio": "1.0.0-rc.12",
 		"got": "^14.4.5",
+		"load-json-file": "^7.0.1",
 		"lodash": "^4.17.21",
 		"luxon": "^3.5.0"
 	},

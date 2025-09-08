@@ -22,7 +22,7 @@
 
 [ a rr:TriplesMap ]
   rml:logicalSource [
-    rml:source "data/source.json";
+    rml:source "data/source-with-ars.json";
     rml:referenceFormulation ql:JSONPath;
     rml:iterator "$[?(@.Type == 'S')]"
   ];
@@ -30,12 +30,12 @@
     rr:template "resource/by-key/ifopt/{.DHID}";
     rr:class netex:StopPlace
   ];
-	rr:predicateObjectMap [
+  rr:predicateObjectMap [
     rr:predicate netex:topographicPlace;
     rr:objectMap [
       rr:termType rr:IRI;
-      rr:template "resource/by-key/ags/{.MunicipalityCode}"
-    ]
+      rr:template "resource/by-key/ars-padded/{.arsPadded}"
+    ];
   ], [
     rr:predicate bahnhof:ifoptStopId;
     rr:objectMap [
@@ -44,13 +44,13 @@
       rml:reference "$.DHID"
     ]
   ], [
-		rr:predicate netex:name;
+    rr:predicate netex:name;
     rr:objectMap [
       rr:datatype xsd:string;
       rr:termType rr:Literal;
       rml:reference "$.Name"
     ]
-	].
-	# todo: other attributes
+  ].
+  # todo: other attributes
 
 # todo: level 2 (quay - platform), level 3 (quay - platform edge)

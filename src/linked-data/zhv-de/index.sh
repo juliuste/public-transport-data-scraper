@@ -11,12 +11,19 @@ wget -q --show-progress --progress=dot:mega -c -N -O "$BIN_DIR/rmlmapper.jar" ht
 rm -rf "$DATA_DIR"
 mkdir -p "$DATA_DIR"
 
+echo 'Fetching AGS mapping…'
+curl 'https://scraped.data.juliustens.eu/vg250-ew/ags2ars.json.gz' \
+| gunzip > "$DATA_DIR/ags2ars.json"
+
 echo 'Preparing data…'
 cp "$DIR/../../../de-zhv.zip" "$DATA_DIR/source.zip"
 unzip "$DATA_DIR/source.zip" -d "$DATA_DIR/unzipped"
 find "$DATA_DIR/unzipped/" -name "*.csv" -exec mv '{}' "$DATA_DIR/source.csv" \;
 
 pnpx csvtojson --delimiter=";" "$DATA_DIR/source.csv" > "$DATA_DIR/source.json"
+
+echo 'Adding ARS keys…'
+node "$DIR/convert.js" > $DATA_DIR/source-with-ars.json
 
 echo 'Applying mapping…'
 java -jar "$BIN_DIR/rmlmapper.jar" -m "$DIR/mapping.ttl" -s turtle --strict --base-iri "$BASE_IRI" > "$DATA_DIR/output.ttl"
