@@ -1,5 +1,6 @@
 @prefix bahnhof: <https://lod.bahnhof.de/vocabulary/db/>.
 @prefix codeforde: <https://lod.codefor.de/vocabulary/codeforde/>.
+@prefix zhv: <https://lod.codefor.de/vocabulary/zhv/>.
 @prefix dct: <http://purl.org/dc/terms/>.
 @prefix dbo: <https://dbpedia.org/ontology/>.
 @prefix foaf: <http://xmlns.com/foaf/0.1/>.
@@ -49,6 +50,13 @@
       rr:datatype xsd:string;
       rr:termType rr:Literal;
       rml:reference "$.Name"
+    ]
+  ], [
+    rr:predicate zhv:lastOperationDate;
+    rr:objectMap [
+      rr:datatype xsd:dateTime;
+      rr:termType rr:Literal;
+      rml:reference "$.LastOperationDate"
     ]
   ].
   # todo: other attributes
