@@ -3,7 +3,7 @@
 // 2. download the data using the session cookie
 
 import { DateTime } from 'luxon'
-import cheerio from 'cheerio'
+import * as cheerio from 'cheerio'
 import got from 'got'
 import lodash from 'lodash'
 import { basename } from 'path'
