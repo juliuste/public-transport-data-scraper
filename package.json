@@ -25,16 +25,16 @@
 	},
 	"dependencies": {
 		"cheerio": "1.1.2",
-		"got": "^14.4.5",
+		"got": "^14.6.5",
 		"load-json-file": "^7.0.1",
 		"lodash": "^4.17.21",
-		"luxon": "^3.5.0"
+		"luxon": "^3.7.2"
 	},
 	"devDependencies": {
 		"depcheck": "^1.4.7",
 		"eslint": "^8.57.1",
 		"eslint-config-standard": "^17.1.0",
-		"eslint-plugin-import": "^2.31.0",
+		"eslint-plugin-import": "^2.32.0",
 		"eslint-plugin-n": "^16.6.2",
 		"eslint-plugin-promise": "^6.6.0"
 	},
