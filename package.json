@@ -24,7 +24,7 @@
 		"test": "npm run lint && npm run check-deps"
 	},
 	"dependencies": {
-		"cheerio": "1.1.2",
+		"cheerio": "1.2.0",
 		"got": "^14.6.5",
 		"load-json-file": "^7.0.1",
 		"lodash": "^4.17.21",
