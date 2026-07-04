@@ -11,8 +11,8 @@
 	"type": "module",
 	"scripts": {
 		"check-deps": "depcheck",
-		"fix": "npm run lint -- --fix",
-		"lint": "eslint src",
+		"fix": "standard --fix",
+		"lint": "standard",
 		"fetch-de-gtfs": "DATASET=DE_GTFS FILE_NAME=de-gtfs.zip MINIMUM_SIZE_MB=100 ./src/run.sh",
 		"fetch-de-hvv-gtfs": "DATASET=DE_HVV_GTFS FILE_NAME=de-hvv-gtfs.zip MINIMUM_SIZE_MB=25 ./src/run.sh",
 		"fetch-de-netex": "DATASET=DE_NETEX FILE_NAME=de-netex.zip MINIMUM_SIZE_MB=500 ./src/run.sh",
@@ -25,18 +25,14 @@
 	},
 	"dependencies": {
 		"cheerio": "1.1.2",
-		"got": "^14.6.5",
+		"got": "^15.1.0",
 		"load-json-file": "^7.0.1",
-		"lodash": "^4.17.21",
+		"lodash": "^4.18.1",
 		"luxon": "^3.7.2"
 	},
 	"devDependencies": {
 		"depcheck": "^1.4.7",
-		"eslint": "^8.57.1",
-		"eslint-config-standard": "^17.1.0",
-		"eslint-plugin-import": "^2.32.0",
-		"eslint-plugin-n": "^16.6.2",
-		"eslint-plugin-promise": "^6.6.0"
+		"standard": "^17.1.2"
 	},
 	"engines": {
 		"node": ">=18"
