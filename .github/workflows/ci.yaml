@@ -5,27 +5,27 @@ on:
   schedule:
     # keep request limits in mind before increasing the cron frequency
     # * is a special character in YAML so you have to quote this string
-    - cron: '0 2 * * *'
+    - cron: "0 2 * * *"
 jobs:
   test:
     runs-on: ubuntu-22.04
     steps:
-    - name: Checkout main
-      uses: actions/checkout@v4
-    - uses: pnpm/action-setup@v3
-      name: Set up pnpm
-      with:
-        version: 8
-    - name: Set up Node
-      uses: actions/setup-node@v4
-      with:
-        node-version: 20
-    - name: Install dependencies
-      run: pnpm install
-    - name: Run tests
-      run: pnpm test
-      env:
-        CI: true
+      - name: Checkout main
+        uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v3
+        name: Set up pnpm
+        with:
+          version: 11
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Install dependencies
+        run: pnpm install
+      - name: Run tests
+        run: pnpm test
+        env:
+          CI: true
 
   fetch-and-publish:
     runs-on: ubuntu-22.04
@@ -33,203 +33,203 @@ jobs:
     needs: test
     if: github.ref == 'refs/heads/main'
     steps:
-    - name: Checkout main
-      uses: actions/checkout@v4
-    - uses: actions/setup-java@v5
-      with:
-        distribution: 'temurin' # See 'Supported distributions' for available options
-        java-version: '21'
-    - name: Set up Python 3
-      uses: actions/setup-python@v5
-      with:
-        python-version: 3
-    - name: Log awscli version
-      run: aws --version
-    - name: Set up awscli configuration
-      env:
-        S3_ACCESS_KEY_ID: ${{ secrets.S3_ACCESS_KEY_ID }}
-        S3_SECRET_ACCESS_KEY: ${{ secrets.S3_SECRET_ACCESS_KEY }}
-        S3_ENDPOINT: ${{ secrets.S3_ENDPOINT }}
-      run: |
-        set -e;
-        mkdir ~/.aws;
-        echo "
-        [default]
-        aws_access_key_id=$S3_ACCESS_KEY_ID
-        aws_secret_access_key=$S3_SECRET_ACCESS_KEY
-        " > ~/.aws/credentials;
-        echo "
-        [default]
-        endpoint_url = $S3_ENDPOINT
-        s3 =
-          multipart_threshold = 4GB
-          multipart_chunksize = 4GB
-          request_checksum_calculation = when_required
-        " > ~/.aws/config;
+      - name: Checkout main
+        uses: actions/checkout@v4
+      - uses: actions/setup-java@v5
+        with:
+          distribution: "temurin" # See 'Supported distributions' for available options
+          java-version: "21"
+      - name: Set up Python 3
+        uses: actions/setup-python@v5
+        with:
+          python-version: 3
+      - name: Log awscli version
+        run: aws --version
+      - name: Set up awscli configuration
+        env:
+          S3_ACCESS_KEY_ID: ${{ secrets.S3_ACCESS_KEY_ID }}
+          S3_SECRET_ACCESS_KEY: ${{ secrets.S3_SECRET_ACCESS_KEY }}
+          S3_ENDPOINT: ${{ secrets.S3_ENDPOINT }}
+        run: |
+          set -e;
+          mkdir ~/.aws;
+          echo "
+          [default]
+          aws_access_key_id=$S3_ACCESS_KEY_ID
+          aws_secret_access_key=$S3_SECRET_ACCESS_KEY
+          " > ~/.aws/credentials;
+          echo "
+          [default]
+          endpoint_url = $S3_ENDPOINT
+          s3 =
+            multipart_threshold = 4GB
+            multipart_chunksize = 4GB
+            request_checksum_calculation = when_required
+          " > ~/.aws/config;
 
-    - uses: pnpm/action-setup@v3
-      name: Set up pnpm
-      with:
-        version: 8
-    - name: Set up Node
-      uses: actions/setup-node@v4
-      with:
-        node-version: 20
-    - name: Install node dependencies
-      run: pnpm install
+      - uses: pnpm/action-setup@v3
+        name: Set up pnpm
+        with:
+          version: 11
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Install node dependencies
+        run: pnpm install
 
-    - name: "Fetch and upload feed: DE_GTFS"
-      if: ${{ success() }} # this should allow the other steps to run, but should still mark the workflow as failing
-      env:
-        OPENDATA_OEPNV_EMAIL: ${{ secrets.OPENDATA_OEPNV_EMAIL }}
-        OPENDATA_OEPNV_PASSWORD: ${{ secrets.OPENDATA_OEPNV_PASSWORD }}
-        S3_BUCKET_NAME: ${{ secrets.S3_BUCKET_NAME }}
-      run: |
-        set -e;
-        npm run fetch-de-gtfs;
-        currentobj=$(aws s3api head-object --bucket $S3_BUCKET_NAME --key de/gtfs.zip || echo 'not-yet-existing');
-        newhash=$(cat de-gtfs.zip | md5sum);
-        if [ $(echo $currentobj | grep $newhash | wc -l) -ne 1 ]
-        then
-          aws s3 cp --checksum-algorithm=CRC32 --acl public-read de-gtfs.zip s3://"$S3_BUCKET_NAME"/de/gtfs.zip
-        else
-          echo 'file unchanged, skipping.'
-        fi;
+      - name: "Fetch and upload feed: DE_GTFS"
+        if: ${{ success() }} # this should allow the other steps to run, but should still mark the workflow as failing
+        env:
+          OPENDATA_OEPNV_EMAIL: ${{ secrets.OPENDATA_OEPNV_EMAIL }}
+          OPENDATA_OEPNV_PASSWORD: ${{ secrets.OPENDATA_OEPNV_PASSWORD }}
+          S3_BUCKET_NAME: ${{ secrets.S3_BUCKET_NAME }}
+        run: |
+          set -e;
+          npm run fetch-de-gtfs;
+          currentobj=$(aws s3api head-object --bucket $S3_BUCKET_NAME --key de/gtfs.zip || echo 'not-yet-existing');
+          newhash=$(cat de-gtfs.zip | md5sum);
+          if [ $(echo $currentobj | grep $newhash | wc -l) -ne 1 ]
+          then
+            aws s3 cp --checksum-algorithm=CRC32 --acl public-read de-gtfs.zip s3://"$S3_BUCKET_NAME"/de/gtfs.zip
+          else
+            echo 'file unchanged, skipping.'
+          fi;
 
-    - name: "Fetch and upload feed: DE_ZHV"
-      if: ${{ success() || failure() }} # this should allow the other steps to run, but should still mark the workflow as failing
-      env:
-        OPENDATA_OEPNV_EMAIL: ${{ secrets.OPENDATA_OEPNV_EMAIL }}
-        OPENDATA_OEPNV_PASSWORD: ${{ secrets.OPENDATA_OEPNV_PASSWORD }}
-        S3_BUCKET_NAME: ${{ secrets.S3_BUCKET_NAME }}
-      run: |
-        set -e;
-        npm run fetch-de-zhv;
-        currentobj=$(aws s3api head-object --bucket $S3_BUCKET_NAME --key de/zhv.zip || echo 'not-yet-existing');
-        newhash=$(cat de-zhv.zip | md5sum);
-        if [ $(echo $currentobj | grep $newhash | wc -l) -ne 1 ]
-        then
-          aws s3 cp --checksum-algorithm=CRC32 --acl public-read de-zhv.zip s3://"$S3_BUCKET_NAME"/de/zhv.zip
-        else
-          echo 'file unchanged, skipping.'
-        fi;
+      - name: "Fetch and upload feed: DE_ZHV"
+        if: ${{ success() || failure() }} # this should allow the other steps to run, but should still mark the workflow as failing
+        env:
+          OPENDATA_OEPNV_EMAIL: ${{ secrets.OPENDATA_OEPNV_EMAIL }}
+          OPENDATA_OEPNV_PASSWORD: ${{ secrets.OPENDATA_OEPNV_PASSWORD }}
+          S3_BUCKET_NAME: ${{ secrets.S3_BUCKET_NAME }}
+        run: |
+          set -e;
+          npm run fetch-de-zhv;
+          currentobj=$(aws s3api head-object --bucket $S3_BUCKET_NAME --key de/zhv.zip || echo 'not-yet-existing');
+          newhash=$(cat de-zhv.zip | md5sum);
+          if [ $(echo $currentobj | grep $newhash | wc -l) -ne 1 ]
+          then
+            aws s3 cp --checksum-algorithm=CRC32 --acl public-read de-zhv.zip s3://"$S3_BUCKET_NAME"/de/zhv.zip
+          else
+            echo 'file unchanged, skipping.'
+          fi;
 
-    - name: "Generate linked data: DE_ZHV"
-      # todo: do not run if processing the dataset failed
-      if: ${{ success() }} # this should allow the other steps to run, but should still mark the workflow as failing
-      env:
-        S3_BUCKET_NAME: ${{ secrets.S3_BUCKET_NAME }}
-      run: |
-        set -e;
-        ./src/linked-data/zhv-de/index.sh
-        currentobj=$(aws s3api head-object --bucket $S3_BUCKET_NAME --key de/zhv.ttl.gz || echo 'not-yet-existing');
-        newhash=$(cat ./src/linked-data/zhv-de/data/output.ttl.gz | md5sum);
-        if [ $(echo $currentobj | grep $newhash | wc -l) -ne 1 ]
-        then
-          aws s3 cp --checksum-algorithm=CRC32 --acl public-read ./src/linked-data/zhv-de/data/output.ttl.gz s3://"$S3_BUCKET_NAME"/de/zhv.ttl.gz
-        else
-          echo 'file unchanged, skipping.'
-        fi;
+      - name: "Generate linked data: DE_ZHV"
+        # todo: do not run if processing the dataset failed
+        if: ${{ success() }} # this should allow the other steps to run, but should still mark the workflow as failing
+        env:
+          S3_BUCKET_NAME: ${{ secrets.S3_BUCKET_NAME }}
+        run: |
+          set -e;
+          ./src/linked-data/zhv-de/index.sh
+          currentobj=$(aws s3api head-object --bucket $S3_BUCKET_NAME --key de/zhv.ttl.gz || echo 'not-yet-existing');
+          newhash=$(cat ./src/linked-data/zhv-de/data/output.ttl.gz | md5sum);
+          if [ $(echo $currentobj | grep $newhash | wc -l) -ne 1 ]
+          then
+            aws s3 cp --checksum-algorithm=CRC32 --acl public-read ./src/linked-data/zhv-de/data/output.ttl.gz s3://"$S3_BUCKET_NAME"/de/zhv.ttl.gz
+          else
+            echo 'file unchanged, skipping.'
+          fi;
 
-    - name: "Fetch and upload feed: DE_NETEX"
-      if: ${{ success() || failure() }} # this should allow the other steps to run, but should still mark the workflow as failing
-      env:
-        OPENDATA_OEPNV_EMAIL: ${{ secrets.OPENDATA_OEPNV_EMAIL }}
-        OPENDATA_OEPNV_PASSWORD: ${{ secrets.OPENDATA_OEPNV_PASSWORD }}
-        S3_BUCKET_NAME: ${{ secrets.S3_BUCKET_NAME }}
-      run: |
-        set -e;
-        npm run fetch-de-netex;
-        currentobj=$(aws s3api head-object --bucket $S3_BUCKET_NAME --key de/netex.zip || echo 'not-yet-existing');
-        newhash=$(cat de-netex.zip | md5sum);
-        if [ $(echo $currentobj | grep $newhash | wc -l) -ne 1 ]
-        then
-          aws s3 cp --checksum-algorithm=CRC32 --acl public-read de-netex.zip s3://"$S3_BUCKET_NAME"/de/netex.zip
-        else
-          echo 'file unchanged, skipping.'
-        fi;
+      - name: "Fetch and upload feed: DE_NETEX"
+        if: ${{ success() || failure() }} # this should allow the other steps to run, but should still mark the workflow as failing
+        env:
+          OPENDATA_OEPNV_EMAIL: ${{ secrets.OPENDATA_OEPNV_EMAIL }}
+          OPENDATA_OEPNV_PASSWORD: ${{ secrets.OPENDATA_OEPNV_PASSWORD }}
+          S3_BUCKET_NAME: ${{ secrets.S3_BUCKET_NAME }}
+        run: |
+          set -e;
+          npm run fetch-de-netex;
+          currentobj=$(aws s3api head-object --bucket $S3_BUCKET_NAME --key de/netex.zip || echo 'not-yet-existing');
+          newhash=$(cat de-netex.zip | md5sum);
+          if [ $(echo $currentobj | grep $newhash | wc -l) -ne 1 ]
+          then
+            aws s3 cp --checksum-algorithm=CRC32 --acl public-read de-netex.zip s3://"$S3_BUCKET_NAME"/de/netex.zip
+          else
+            echo 'file unchanged, skipping.'
+          fi;
 
-    - name: "Fetch and upload feed: DE_NRW_GTFS"
-      if: ${{ success() || failure() }} # this should allow the other steps to run, but should still mark the workflow as failing
-      env:
-        OPENDATA_OEPNV_EMAIL: ${{ secrets.OPENDATA_OEPNV_EMAIL }}
-        OPENDATA_OEPNV_PASSWORD: ${{ secrets.OPENDATA_OEPNV_PASSWORD }}
-        S3_BUCKET_NAME: ${{ secrets.S3_BUCKET_NAME }}
-      run: |
-        set -e;
-        npm run fetch-de-nrw-gtfs;
-        currentobj=$(aws s3api head-object --bucket $S3_BUCKET_NAME --key de/nrw-gtfs.zip || echo 'not-yet-existing');
-        newhash=$(cat de-nrw-gtfs.zip | md5sum);
-        if [ $(echo $currentobj | grep $newhash | wc -l) -ne 1 ]
-        then
-          aws s3 cp --checksum-algorithm=CRC32 --acl public-read de-nrw-gtfs.zip s3://"$S3_BUCKET_NAME"/de/nrw-gtfs.zip
-        else
-          echo 'file unchanged, skipping.'
-        fi;
+      - name: "Fetch and upload feed: DE_NRW_GTFS"
+        if: ${{ success() || failure() }} # this should allow the other steps to run, but should still mark the workflow as failing
+        env:
+          OPENDATA_OEPNV_EMAIL: ${{ secrets.OPENDATA_OEPNV_EMAIL }}
+          OPENDATA_OEPNV_PASSWORD: ${{ secrets.OPENDATA_OEPNV_PASSWORD }}
+          S3_BUCKET_NAME: ${{ secrets.S3_BUCKET_NAME }}
+        run: |
+          set -e;
+          npm run fetch-de-nrw-gtfs;
+          currentobj=$(aws s3api head-object --bucket $S3_BUCKET_NAME --key de/nrw-gtfs.zip || echo 'not-yet-existing');
+          newhash=$(cat de-nrw-gtfs.zip | md5sum);
+          if [ $(echo $currentobj | grep $newhash | wc -l) -ne 1 ]
+          then
+            aws s3 cp --checksum-algorithm=CRC32 --acl public-read de-nrw-gtfs.zip s3://"$S3_BUCKET_NAME"/de/nrw-gtfs.zip
+          else
+            echo 'file unchanged, skipping.'
+          fi;
 
-    - name: "Fetch and upload feed: DE_HVV_GTFS"
-      if: ${{ success() || failure() }} # this should allow the other steps to run, but should still mark the workflow as failing
-      env:
-        OPENDATA_OEPNV_EMAIL: ${{ secrets.OPENDATA_OEPNV_EMAIL }}
-        OPENDATA_OEPNV_PASSWORD: ${{ secrets.OPENDATA_OEPNV_PASSWORD }}
-        S3_BUCKET_NAME: ${{ secrets.S3_BUCKET_NAME }}
-      run: |
-        set -e;
-        npm run fetch-de-hvv-gtfs;
-        currentobj=$(aws s3api head-object --bucket $S3_BUCKET_NAME --key de/hvv-gtfs.zip || echo 'not-yet-existing');
-        newhash=$(cat de-hvv-gtfs.zip | md5sum);
-        if [ $(echo $currentobj | grep $newhash | wc -l) -ne 1 ]
-        then
-          aws s3 cp --checksum-algorithm=CRC32 --acl public-read de-hvv-gtfs.zip s3://"$S3_BUCKET_NAME"/de/hvv-gtfs.zip
-        else
-          echo 'file unchanged, skipping.'
-        fi;
+      - name: "Fetch and upload feed: DE_HVV_GTFS"
+        if: ${{ success() || failure() }} # this should allow the other steps to run, but should still mark the workflow as failing
+        env:
+          OPENDATA_OEPNV_EMAIL: ${{ secrets.OPENDATA_OEPNV_EMAIL }}
+          OPENDATA_OEPNV_PASSWORD: ${{ secrets.OPENDATA_OEPNV_PASSWORD }}
+          S3_BUCKET_NAME: ${{ secrets.S3_BUCKET_NAME }}
+        run: |
+          set -e;
+          npm run fetch-de-hvv-gtfs;
+          currentobj=$(aws s3api head-object --bucket $S3_BUCKET_NAME --key de/hvv-gtfs.zip || echo 'not-yet-existing');
+          newhash=$(cat de-hvv-gtfs.zip | md5sum);
+          if [ $(echo $currentobj | grep $newhash | wc -l) -ne 1 ]
+          then
+            aws s3 cp --checksum-algorithm=CRC32 --acl public-read de-hvv-gtfs.zip s3://"$S3_BUCKET_NAME"/de/hvv-gtfs.zip
+          else
+            echo 'file unchanged, skipping.'
+          fi;
 
-    - name: "Fetch and upload feed: LU_GTFS"
-      if: ${{ success() || failure() }} # this should allow the other steps to run, but should still mark the workflow as failing
-      env:
-        S3_BUCKET_NAME: ${{ secrets.S3_BUCKET_NAME }}
-      run: |
-        set -e;
-        npm run fetch-lu-gtfs;
-        currentobj=$(aws s3api head-object --bucket $S3_BUCKET_NAME --key lu/gtfs.zip || echo 'not-yet-existing');
-        newhash=$(cat lu-gtfs.zip | md5sum);
-        if [ $(echo $currentobj | grep $newhash | wc -l) -ne 1 ]
-        then
-          aws s3 cp --checksum-algorithm=CRC32 --acl public-read lu-gtfs.zip s3://"$S3_BUCKET_NAME"/lu/gtfs.zip
-        else
-          echo 'file unchanged, skipping.'
-        fi;
+      - name: "Fetch and upload feed: LU_GTFS"
+        if: ${{ success() || failure() }} # this should allow the other steps to run, but should still mark the workflow as failing
+        env:
+          S3_BUCKET_NAME: ${{ secrets.S3_BUCKET_NAME }}
+        run: |
+          set -e;
+          npm run fetch-lu-gtfs;
+          currentobj=$(aws s3api head-object --bucket $S3_BUCKET_NAME --key lu/gtfs.zip || echo 'not-yet-existing');
+          newhash=$(cat lu-gtfs.zip | md5sum);
+          if [ $(echo $currentobj | grep $newhash | wc -l) -ne 1 ]
+          then
+            aws s3 cp --checksum-algorithm=CRC32 --acl public-read lu-gtfs.zip s3://"$S3_BUCKET_NAME"/lu/gtfs.zip
+          else
+            echo 'file unchanged, skipping.'
+          fi;
 
-    - name: "Fetch and upload feed: LU_NETEX"
-      if: ${{ success() || failure() }} # this should allow the other steps to run, but should still mark the workflow as failing
-      env:
-        S3_BUCKET_NAME: ${{ secrets.S3_BUCKET_NAME }}
-      run: |
-        set -e;
-        npm run fetch-lu-netex;
-        currentobj=$(aws s3api head-object --bucket $S3_BUCKET_NAME --key lu/netex.zip || echo 'not-yet-existing');
-        newhash=$(cat lu-netex.zip | md5sum);
-        if [ $(echo $currentobj | grep $newhash | wc -l) -ne 1 ]
-        then
-          aws s3 cp --checksum-algorithm=CRC32 --acl public-read lu-netex.zip s3://"$S3_BUCKET_NAME"/lu/netex.zip
-        else
-          echo 'file unchanged, skipping.'
-        fi;
+      - name: "Fetch and upload feed: LU_NETEX"
+        if: ${{ success() || failure() }} # this should allow the other steps to run, but should still mark the workflow as failing
+        env:
+          S3_BUCKET_NAME: ${{ secrets.S3_BUCKET_NAME }}
+        run: |
+          set -e;
+          npm run fetch-lu-netex;
+          currentobj=$(aws s3api head-object --bucket $S3_BUCKET_NAME --key lu/netex.zip || echo 'not-yet-existing');
+          newhash=$(cat lu-netex.zip | md5sum);
+          if [ $(echo $currentobj | grep $newhash | wc -l) -ne 1 ]
+          then
+            aws s3 cp --checksum-algorithm=CRC32 --acl public-read lu-netex.zip s3://"$S3_BUCKET_NAME"/lu/netex.zip
+          else
+            echo 'file unchanged, skipping.'
+          fi;
 
-    - name: "Fetch and upload feed: SE_GTFS"
-      if: ${{ success() || failure() }} # this should allow the other steps to run, but should still mark the workflow as failing
-      env:
-        TRAFIKLAB_API_KEY: ${{ secrets.TRAFIKLAB_API_KEY }}
-        S3_BUCKET_NAME: ${{ secrets.S3_BUCKET_NAME }}
-      run: |
-        set -e;
-        npm run fetch-se-gtfs;
-        currentobj=$(aws s3api head-object --bucket $S3_BUCKET_NAME --key se/gtfs.zip || echo 'not-yet-existing');
-        newhash=$(cat se-gtfs.zip | md5sum);
-        if [ $(echo $currentobj | grep $newhash | wc -l) -ne 1 ]
-        then
-          aws s3 cp --checksum-algorithm=CRC32 --acl public-read se-gtfs.zip s3://"$S3_BUCKET_NAME"/se/gtfs.zip
-        else
-          echo 'file unchanged, skipping.'
-        fi;
+      - name: "Fetch and upload feed: SE_GTFS"
+        if: ${{ success() || failure() }} # this should allow the other steps to run, but should still mark the workflow as failing
+        env:
+          TRAFIKLAB_API_KEY: ${{ secrets.TRAFIKLAB_API_KEY }}
+          S3_BUCKET_NAME: ${{ secrets.S3_BUCKET_NAME }}
+        run: |
+          set -e;
+          npm run fetch-se-gtfs;
+          currentobj=$(aws s3api head-object --bucket $S3_BUCKET_NAME --key se/gtfs.zip || echo 'not-yet-existing');
+          newhash=$(cat se-gtfs.zip | md5sum);
+          if [ $(echo $currentobj | grep $newhash | wc -l) -ne 1 ]
+          then
+            aws s3 cp --checksum-algorithm=CRC32 --acl public-read se-gtfs.zip s3://"$S3_BUCKET_NAME"/se/gtfs.zip
+          else
+            echo 'file unchanged, skipping.'
+          fi;
